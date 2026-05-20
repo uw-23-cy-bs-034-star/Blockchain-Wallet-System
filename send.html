@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Transaction - Blockchain Wallet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="logo">Blockchain Wallet</div>
+            
+            <div class="wallet-info">
+                <h3>{{ wallet.name }}</h3>
+                <div class="balance">{{ "%.2f"|format(wallet.balance) }} BTC</div>
+                <div class="address">Username: {{ session.username }}</div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('send') }}" class="active">Send Transaction</a>
+                <a href="{{ url_for('blockchain_view') }}">Blockchain Explorer</a>
+                <a href="{{ url_for('dh_demo') }}">DH Key Exchange</a>
+                <a href="{{ url_for('logout') }}">Sign Out</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <h2>Send Cryptocurrency</h2>
+                
+                <div class="form-group">
+                    <label>Sender</label>
+                    <input type="text" id="sender" value="{{ session.username }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Recipient</label>
+                    <select id="receiver">
+                        <option value="">Select recipient</option>
+                        <option value="alice">Alice Johnson</option>
+                        <option value="bob">Bob Smith</option>
+                        <option value="charlie">Charlie Brown</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Amount (BTC)</label>
+                    <input type="number" id="amount" step="0.01" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>Private Key (Digital Signature)</label>
+                    <input type="password" id="privateKey" placeholder="Enter your private key to sign transaction">
+                    <small style="color: #64748b; display: block; margin-top: 5px;">
+                        Your private key: {{ wallet.private_key[:20] }}... 
+                        (Get full key from Dashboard)
+                    </small>
+                </div>
+                
+                <button class="btn" onclick="sendTransaction()">Sign and Send</button>
+                
+                <div id="result" style="display: none; margin-top: 20px; padding: 15px; border-radius: 10px;"></div>
+            </div>
+            
+            <div class="card">
+                <h2>How Digital Signatures Work</h2>
+                <p style="color: #94a3b8; line-height: 1.6;">
+                    1. Transaction data is created (sender, receiver, amount)<br>
+                    2. Transaction is hashed using SHA-256<br>
+                    3. Hash is encrypted with sender's private key → Digital Signature<br>
+                    4. Signature is sent with transaction<br>
+                    5. Network verifies using sender's public key<br>
+                    6. If valid, transaction is added to blockchain
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function sendTransaction() {
+            const receiver = document.getElementById('receiver').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const privateKey = document.getElementById('privateKey').value;
+            
+            if(!receiver) {
+                alert('Please select a recipient');
+                return;
+            }
+            
+            if(!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            if(!privateKey) {
+                alert('Please enter your private key to sign the transaction. Get it from the Dashboard.');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'rgba(0, 212, 255, 0.1)';
+            resultDiv.innerHTML = 'Processing transaction...';
+            
+            try {
+                const response = await fetch('/send_transaction', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        sender: '{{ session.username }}',
+                        receiver: receiver,
+                        amount: amount,
+                        private_key: privateKey
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    resultDiv.style.background = 'rgba(0, 255, 0, 0.1)';
+                    resultDiv.style.border = '1px solid #00ff00';
+                    resultDiv.innerHTML = `
+                        <strong>Success!</strong><br><br>
+                        ${data.message}<br><br>
+                        Transaction: ${data.transaction}<br>
+                        Signature: ${data.signature}<br>
+                        Block Index: ${data.block_index}<br><br>
+                        Redirecting to dashboard...
+                    `;
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    resultDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                    resultDiv.style.border = '1px solid #ff0000';
+                    resultDiv.innerHTML = `<strong>Error</strong><br>${data.message}<br><br>Make sure you are using the correct private key from the Dashboard.`;
+                }
+            } catch(error) {
+                resultDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                resultDiv.style.border = '1px solid #ff0000';
+                resultDiv.innerHTML = `<strong>Network Error</strong><br>Please try again.`;
+            }
+        }
+    </script>
+</body>
+</html>

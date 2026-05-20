@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="logo">Blockchain Wallet</div>
+            
+            <div class="wallet-info">
+                <h3>Blockchain Explorer</h3>
+                <div class="address">Immutable Ledger</div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('send') }}">Send Transaction</a>
+                <a href="{{ url_for('blockchain_view') }}" class="active">Blockchain Explorer</a>
+                <a href="{{ url_for('dh_demo') }}">DH Key Exchange</a>
+                <a href="{{ url_for('logout') }}">Sign Out</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <h2>Blockchain Ledger</h2>
+                <div class="alert alert-info">Status: {{ status_message }}</div>
+                
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="verifyChain()" style="width: auto; padding: 8px 20px;">Verify Chain Integrity</button>
+                </div>
+                
+                <div id="verificationResult"></div>
+            </div>
+            
+            {% for block in blockchain %}
+            <div class="block">
+                <h3>Block #{{ block.index }}</h3>
+                <div class="block-detail">
+                    <strong>Transaction:</strong> {{ block.transaction }}
+                </div>
+                <div class="block-detail">
+                    <strong>Signature:</strong> <span class="hash">{{ block.signature[:40] }}...</span>
+                </div>
+                <div class="block-detail">
+                    <strong>Timestamp:</strong> {{ block.timestamp[:19] }}
+                </div>
+                <div class="block-detail">
+                    <strong>Previous Hash:</strong> <span class="hash">{{ block.previous_hash[:40] }}...</span>
+                </div>
+                <div class="block-detail">
+                    <strong>Block Hash:</strong> <span class="hash">{{ block.hash[:40] }}...</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script>
+        async function verifyChain() {
+            const response = await fetch('/api/verify_chain');
+            const data = await response.json();
+            
+            const resultDiv = document.getElementById('verificationResult');
+            if(data.valid) {
+                resultDiv.innerHTML = '<div class="alert alert-success">Blockchain verification passed. All blocks are valid.</div>';
+            } else {
+                resultDiv.innerHTML = '<div class="alert alert-error">Blockchain verification failed: ' + data.message + '</div>';
+            }
+            
+            setTimeout(() => {
+                resultDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

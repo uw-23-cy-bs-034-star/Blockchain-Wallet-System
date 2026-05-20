@@ -1,0 +1,328 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-card h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #00d4ff;
+}
+
+.login-card .subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00d4ff, #0077ff);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c63ff, #3f3d9e);
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #94a3b8;
+}
+
+.auth-link a {
+    color: #00d4ff;
+    text-decoration: none;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00d4ff;
+    margin-bottom: 40px;
+}
+
+.wallet-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.wallet-info h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+}
+
+.wallet-info .balance {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00d4ff;
+    margin: 10px 0;
+}
+
+.wallet-info .address {
+    font-size: 11px;
+    color: #64748b;
+    word-break: break-all;
+}
+
+.sidebar-nav {
+    margin-top: 20px;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 12px 15px;
+    margin: 5px 0;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+}
+
+.sidebar-nav a.active {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Cards */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card h2 {
+    color: #00d4ff;
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+}
+
+.alert-error {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    color: #ff0000;
+}
+
+.alert-info {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid #00d4ff;
+    color: #00d4ff;
+}
+
+.alert-warning {
+    background: rgba(255, 255, 0, 0.1);
+    border: 1px solid #ffff00;
+    color: #ffff00;
+}
+
+/* Block View */
+.block {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 3px solid #00d4ff;
+}
+
+.block h3 {
+    color: #00d4ff;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.block-detail {
+    margin: 8px 0;
+    padding: 5px 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.hash {
+    font-family: monospace;
+    color: #ff00ff;
+    font-size: 11px;
+}
+
+/* DH Demo */
+.dh-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.dh-party {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+}
+
+.dh-party.alice {
+    border-top: 3px solid #00d4ff;
+}
+
+.dh-party.bob {
+    border-top: 3px solid #ff00ff;
+}
+
+.dh-party h3 {
+    margin-bottom: 20px;
+}
+
+.shared-secret {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 255, 0.1));
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+}
+
+.secret-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #00ff00;
+    font-family: monospace;
+    margin: 15px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dh-container {
+        grid-template-columns: 1fr;
+    }
+}

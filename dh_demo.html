@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffie-Hellman Key Exchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="logo">Blockchain Wallet</div>
+            
+            <div class="wallet-info">
+                <h3>Security Lab</h3>
+                <div class="address">DH Key Exchange</div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('send') }}">Send Transaction</a>
+                <a href="{{ url_for('blockchain_view') }}">Blockchain Explorer</a>
+                <a href="{{ url_for('dh_demo') }}" class="active">DH Key Exchange</a>
+                <a href="{{ url_for('logout') }}">Sign Out</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <h2>Diffie-Hellman Key Exchange</h2>
+                <p style="color: #94a3b8;">Secure key exchange for blockchain peer-to-peer communication</p>
+            </div>
+            
+            <div id="dhContainer">
+                <div class="dh-container">
+                    <div class="dh-party alice">
+                        <h3>Node A (Alice)</h3>
+                        <div><strong>Private Key (a):</strong> <span id="alicePrivate">-</span></div>
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                            <strong>Public Key (g^a mod p):</strong><br>
+                            <span class="hash" id="alicePublic">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dh-party bob">
+                        <h3>Node B (Bob)</h3>
+                        <div><strong>Private Key (b):</strong> <span id="bobPrivate">-</span></div>
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                            <strong>Public Key (g^b mod p):</strong><br>
+                            <span class="hash" id="bobPublic">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="shared-secret">
+                    <h3>Shared Secret Key</h3>
+                    <div class="secret-value" id="sharedSecret">-</div>
+                    <p style="margin-top: 15px;">Both nodes now have the identical secret key without ever exchanging it</p>
+                    <button class="btn" onclick="runDH()" style="width: auto; margin-top: 20px;">Generate New Keys</button>
+                </div>
+                
+                <div class="card">
+                    <h3>How Diffie-Hellman Works in Blockchain</h3>
+                    <p style="color: #94a3b8; line-height: 1.8;">
+                        <strong>Step 1:</strong> Nodes agree on public parameters (Prime p=29, Base g=3)<br>
+                        <strong>Step 2:</strong> Each node selects a private key (kept secret)<br>
+                        <strong>Step 3:</strong> Each computes public key: public = g^private mod p<br>
+                        <strong>Step 4:</strong> Nodes exchange public keys over the network<br>
+                        <strong>Step 5:</strong> Each computes shared secret using other's public key<br>
+                        <strong>Result:</strong> Both get identical shared secret without transmitting it<br><br>
+                        This ensures secure peer-to-peer communication in blockchain networks.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function runDH() {
+            const response = await fetch('/api/diffie_hellman');
+            const data = await response.json();
+            
+            document.getElementById('alicePrivate').textContent = data.alice_private;
+            document.getElementById('bobPrivate').textContent = data.bob_private;
+            document.getElementById('alicePublic').textContent = data.alice_public;
+            document.getElementById('bobPublic').textContent = data.bob_public;
+            document.getElementById('sharedSecret').textContent = data.shared_secret;
+        }
+        
+        runDH();
+    </script>
+</body>
+</html>

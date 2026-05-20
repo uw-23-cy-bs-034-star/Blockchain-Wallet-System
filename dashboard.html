@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Blockchain Wallet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .key-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        .private-key {
+            color: #ff6b6b;
+            background: rgba(255, 68, 68, 0.1);
+        }
+        .public-key {
+            color: #6bc5ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        .warning {
+            background: rgba(255, 68, 68, 0.1);
+            border-left: 3px solid #ff4444;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .info-note {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #00d4ff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            color: white;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .toggle-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .transaction-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        .transaction-amount {
+            font-weight: bold;
+            color: #00ff00;
+        }
+        .transaction-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .badge {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">Blockchain Wallet</div>
+            
+            <div class="wallet-info">
+                <h3>{{ wallet.name }}</h3>
+                <div class="balance">{{ "%.2f"|format(wallet.balance) }} BTC</div>
+                <div class="address">Username: {{ session.username }}</div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+                <a href="{{ url_for('send') }}">Send Transaction</a>
+                <a href="{{ url_for('blockchain_view') }}">Blockchain Explorer</a>
+                <a href="{{ url_for('dh_demo') }}">DH Key Exchange</a>
+                <a href="{{ url_for('logout') }}">Sign Out</a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Account Overview Card -->
+            <div class="card">
+                <h2>Account Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Balance</div>
+                        <div class="stat-value">{{ "%.2f"|format(wallet.balance) }} BTC</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">USD Value</div>
+                        <div class="stat-value" style="color: #00ff00;">${{ "%.2f"|format(wallet.balance * 63245) }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Blockchain Status</div>
+                        <div class="stat-value" style="color: #00ff00;">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Network</div>
+                        <div class="stat-value" style="color: #00d4ff;">Mainnet</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wallet Keys Card -->
+            <div class="card">
+                <h2>Wallet Keys</h2>
+                
+                <!-- Private Key Section -->
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <div style="color: #ff6b6b; font-weight: bold;">Private Key (Keep Secret)</div>
+                        <span class="badge">Sensitive</span>
+                    </div>
+                    <div class="key-card private-key">
+                        <span id="privateKeyText">{{ wallet.private_key }}</span>
+                    </div>
+                    <button class="toggle-btn" onclick="copyToClipboard('privateKeyText')">Copy Private Key</button>
+                    <div class="warning">
+                        <strong>Warning:</strong> Never share your private key. Anyone with this key can control your wallet.
+                    </div>
+                </div>
+                
+                <!-- Public Key Section -->
+                <div>
+                    <div style="color: #6bc5ff; font-weight: bold; margin-bottom: 5px;">Public Key (Shareable)</div>
+                    <div class="key-card public-key">
+                        <span id="publicKeyText">{{ wallet.public_key }}</span>
+                    </div>
+                    <button class="toggle-btn" onclick="copyToClipboard('publicKeyText')">Copy Public Key</button>
+                    <div class="info-note">
+                        <strong>Note:</strong> Public key is used to verify your digital signatures. You can share this with anyone.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transaction History Card -->
+            <div class="card">
+                <h2>Transaction History</h2>
+                {% if transactions and transactions|length > 0 %}
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        {% for tx in transactions %}
+                        <div class="transaction-item">
+                            <div>
+                                <div style="font-weight: bold;">{{ tx.transaction }}</div>
+                                <div class="transaction-time">{{ tx.timestamp }}</div>
+                            </div>
+                            <div class="transaction-amount">
+                                {% if session.username in tx.transaction %}
+                                    {% if 'sends' in tx.transaction %}
+                                        Sent
+                                    {% endif %}
+                                {% endif %}
+                                <span class="badge">Verified</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #94a3b8; text-align: center; padding: 40px;">No transactions yet. Send crypto to start.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Blockchain Statistics Card -->
+            <div class="card">
+                <h2>Blockchain Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Blocks</div>
+                        <div class="stat-value">{{ blockchain_stats.total_blocks }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">{{ blockchain_stats.transactions }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Chain Valid</div>
+                        <div class="stat-value" style="color: #00ff00;">{{ "Yes" if blockchain_stats.valid else "No" }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Network Hashrate</div>
+                        <div class="stat-value">145 TH/s</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Card -->
+            <div class="card">
+                <h2>Quick Actions</h2>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <a href="{{ url_for('send') }}" style="text-decoration: none;">
+                        <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">Send</div>
+                            <div style="color: #94a3b8; font-size: 12px;">Transfer Crypto</div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('blockchain_view') }}" style="text-decoration: none;">
+                        <div style="background: rgba(255, 0, 255, 0.1); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">Ledger</div>
+                            <div style="color: #94a3b8; font-size: 12px;">View Blockchain</div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('dh_demo') }}" style="text-decoration: none;">
+                        <div style="background: rgba(0, 255, 0, 0.1); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">Security</div>
+                            <div style="color: #94a3b8; font-size: 12px;">DH Key Exchange</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Copied to clipboard!');
+            }, function() {
+                alert('Failed to copy');
+            });
+        }
+        
+        function refreshData() {
+            location.reload();
+        }
+        
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
