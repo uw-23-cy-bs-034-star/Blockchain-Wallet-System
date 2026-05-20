@@ -1,8 +1,5 @@
 # Blockchain-Wallet-System
 Blockchain Wallet System built with Python and Flask featuring secure wallet management, digital signatures, transaction verification, SHA-256 hashing, Diffie-Hellman key exchange, and blockchain ledger storage.
-# SmartSecureCryptoWallet
-
-SmartSecureCryptoWallet is a blockchain-based cryptocurrency wallet system developed using Python and Flask. This project demonstrates the practical implementation of blockchain concepts, cryptographic security, digital signatures, and secure transaction verification through a web-based interface.
 
 ## Features
 
